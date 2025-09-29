@@ -1,0 +1,42 @@
+name: Deploy Lab5 to EC2
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Upload Lab5 to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}      
+          username: ${{ secrets.EC2_USER }}  
+          key: ${{ secrets.EC2_SSH_KEY }}    
+          source: "."                        
+          target: "/home/ubuntu/lab5"
+          rm: true
+          overwrite: true
+
+      - name: Bootstrap venv, install deps, restart service
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script_stop: true
+          script: |
+            set -euo pipefail
+            cd /home/ubuntu/lab5
+            python3 -m venv .venv || true
+            . .venv/bin/activate
+            pip install --upgrade pip
+            pip install -r App/requirements.txt
+            sudo systemctl daemon-reload
+            sudo systemctl restart lab5app
+            sudo systemctl --no-pager status lab5app | tail -n 50
