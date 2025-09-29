@@ -12,11 +12,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Upload Lab5 to EC2
+      - name: Upload App to EC2
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
+          username: ${{ secrets.EC2_USER }}  
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "lab5/tracking_system_backend/App/**"
           target: "/home/ubuntu/lab5/App"
@@ -32,6 +32,7 @@ jobs:
           script_stop: true
           script: |
             set -euo pipefail
+            mkdir -p /home/ubuntu/lab5
             cd /home/ubuntu/lab5
             python3 -m venv .venv || true
             . .venv/bin/activate
