@@ -16,13 +16,14 @@ jobs:
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}  
+          username: ${{ secrets.EC2_USER }}   # ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "lab5/tracking_system_backend/App/**"
-          target: "/home/ubuntu/lab5/App"
+          target: "/home/ubuntu/lab5"         
           rm: true
           overwrite: true
-
+          strip_components: 2                 
+      
       - name: Bootstrap venv, install deps, restart service
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -32,8 +33,9 @@ jobs:
           script_stop: true
           script: |
             set -euo pipefail
-            mkdir -p /home/ubuntu/lab5
             cd /home/ubuntu/lab5
+            # sanity check
+            ls -la App/requirements.txt || (echo "requirements not found"; find . -maxdepth 4 -name requirements.txt -print; exit 1)
             python3 -m venv .venv || true
             . .venv/bin/activate
             pip install --upgrade pip
