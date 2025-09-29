@@ -14,7 +14,7 @@ from App.project.auth.controller.medical_checkup_controller import medical_check
 from App.project.auth.controller.vehicle_transfer_controller import vehicle_transfer_bp
 from App.project.auth.controller.driver_assignment_controller import driver_assignment_bp
 from App.project.auth.controller.driver_has_quarry_controller import driver_has_quarry_bp
-
+from App.project.swagger_route import swagger_bp, swagger_ui_bp
 app = Flask(__name__)
 
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -44,5 +44,7 @@ app.register_blueprint(vehicle_transfer_bp, url_prefix='/api')
 app.register_blueprint(driver_assignment_bp, url_prefix='/api')
 app.register_blueprint(driver_has_quarry_bp, url_prefix='/api')
 
+app.register_blueprint(swagger_bp)
+app.register_blueprint(swagger_ui_bp)
 if __name__ == "__main__":
     app.run(debug=True)
