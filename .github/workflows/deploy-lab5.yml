@@ -2,7 +2,7 @@ name: Deploy Lab5 to EC2
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "lab5" ]
   workflow_dispatch:
 
 jobs:
