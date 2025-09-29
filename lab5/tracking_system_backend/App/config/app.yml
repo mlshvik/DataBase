@@ -1,5 +1,5 @@
 database:
-  host: 'localhost'
-  user: 'root'
-  password: '12345678m'
-  database: 'lab3DB'
+  host: 'database-1.cnggkqkg2hev.eu-north-1.rds.amazonaws.com'
+  user: 'admin'
+  password: 'ez0b3WjiF77tpZeprDwg'
+  database: 'lab5db'
