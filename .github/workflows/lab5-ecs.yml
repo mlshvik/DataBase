@@ -4,7 +4,7 @@ on:
     branches: [ "lab5" ]
 
 env:
-  AWS_REGION: eu-central-1
+  AWS_REGION: eu-north-1
 
   ECR_REPOSITORY: tracking_api
   CLUSTER_NAME: tracking-lab5
