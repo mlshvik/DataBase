@@ -95,14 +95,14 @@ jobs:
           if ! aws rds describe-db-instances --db-instance-identifier "$RDS_ID" >/dev/null 2>&1; then
             aws rds create-db-instance \
               --db-instance-identifier "$RDS_ID" \
-              --engine mysql --engine-version 8.0.35 \
+              --engine mysql \
               --db-instance-class db.t4g.micro \
               --allocated-storage 20 \
               --master-username "$DB_USER" \
               --master-user-password "$DB_MASTER_PASS" \
               --vpc-security-group-ids "$RDS_SG_ID" \
               --db-name "$DB_NAME" \
-              --no-multi-az --publicly-accessible false \
+              --no-multi-az --no-publicly-accessible \
               --backup-retention-period 0 \
               --storage-type gp2
           fi
