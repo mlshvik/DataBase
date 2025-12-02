@@ -354,20 +354,36 @@ jobs:
             --task-definition "$EMU_TASK_FAMILY" \
             --network-configuration "awsvpcConfiguration={subnets=[$SUBNET1,$SUBNET2],assignPublicIp=ENABLED}" >/dev/null
           echo "Emulator started → ${API_URL}/ingest"
-      - name: Smoke test (send 3 events + check DB)
+      - name: Smoke test (init table + send 3 events + check DB)
         run: |
           set -e
           sudo apt-get update -y
           sudo apt-get install -y mysql-client curl jq
+
+          mysql -h "$DB_HOST" -u "$DB_USER" -p"$DB_MASTER_PASS" "$DB_NAME" <<'SQL'
+          CREATE TABLE IF NOT EXISTS sensor_data (
+            id BIGINT AUTO_INCREMENT PRIMARY KEY,
+            sensor_type VARCHAR(32) NOT NULL,
+            value DOUBLE NOT NULL,
+            lat DOUBLE NULL,
+            lon DOUBLE NULL,
+            ts BIGINT NOT NULL
+          ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+          SQL
+
           for p in \
             '{"type":"temperature","value":24.7,"lat":49.84,"lon":24.03}' \
             '{"type":"humidity","value":55.2,"lat":49.84,"lon":24.03}' \
             '{"type":"light","value":350,"lat":49.84,"lon":24.03}'; do
             curl -s -X POST "$API_URL/ingest" -H 'Content-Type: application/json' -d "$p" >/dev/null || true
           done
+
           echo "Waiting for consumer writes..."
           sleep 25
-          mysql -h "$DB_HOST" -u "$DB_USER" -p"$DB_MASTER_PASS" "$DB_NAME" -e "SELECT COUNT(*) AS cnt FROM sensor_data; SELECT * FROM sensor_data ORDER BY id DESC LIMIT 5;"
+
+          mysql -h "$DB_HOST" -u "$DB_USER" -p"$DB_MASTER_PASS" "$DB_NAME" \
+            -e "SELECT COUNT(*) AS cnt FROM sensor_data; SELECT * FROM sensor_data ORDER BY id DESC LIMIT 5;"
+
       - name: Print MySQL connect command (easy copy-paste)
         run: |
           echo
